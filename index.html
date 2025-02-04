@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WebSocket Chat</title>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+    #messages {
+      max-width: 500px;
+      margin: auto;
+      padding: 10px;
+      border: 1px solid #ddd;
+      height: 300px;
+      overflow-y: auto;
+    }
+    input, button {
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h2>WebSocket Chat</h2>
+  <div id="messages"></div>
+  <input type="text" id="messageInput" placeholder="Type a message..." />
+  <button onclick="sendMessage()">Send</button>
+
+  <script>
+    const socket = io('http://localhost:3000'); // Adjust if needed
+
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket server');
+    });
+
+    socket.on('message', (data) => {
+      console.log('Received message:', data);
+      const messagesDiv = document.getElementById('messages');
+      messagesDiv.innerHTML += `<p>${data.sender}:<b>${data.message}</b></p>`;
+      messagesDiv.scrollTop = messagesDiv.scrollHeight;
+    });
+
+    function sendMessage() {
+      const input = document.getElementById('messageInput');
+      const message = input.value.trim();
+      if (message) {
+        socket.emit('message', message);
+        input.value = ''; // Clear input
+      }
+    }
+  </script>
+</body>
+</html>
