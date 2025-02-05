@@ -1,13 +1,14 @@
 import { Process, Processor } from '@nestjs/bull';
-import { Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { Job } from 'bull';
 
 @Processor('audio-queue')
 export class AudioProcessor {
-  private logger = new Logger(AudioProcessor.name);
+  constructor(private readonly eventEmitter: EventEmitter2) {}
   @Process('transcode')
   async handleCompleteJob(job: Job<{ file: string }>) {
     console.log(`Processing job for Started: ${job.data.file}`);
+    this.eventEmitter.emit('audio.transcode', { file: job.data.file });
 
     // Simulate email sending
     await new Promise((resolve) => setTimeout(resolve, 2000));
